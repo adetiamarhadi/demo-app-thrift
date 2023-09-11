@@ -1,0 +1,45 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.github.adetiamarhadi.thrift" />
+
+    <!-- Define MyServiceImpl bean -->
+    <bean id="myServiceHandler" class="com.github.adetiamarhadi.thrift.impl.MyServiceImpl" />
+
+    <!-- Define TServerSocket bean -->
+    <bean id="tServerSocket" class="org.apache.thrift.transport.TServerSocket">
+        <constructor-arg value="9090" /> <!-- Use the desired port -->
+    </bean>
+
+    <!-- Define MyService Processor bean -->
+    <bean id="myServiceProcessorXXX" class="org.apache.thrift.TProcessorFactory">
+        <constructor-arg>
+            <bean class="com.github.adetiamarhadi.thrift.MyService$Processor">
+                <constructor-arg ref="myServiceHandler" />
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <bean id="myServiceProcessor" class="com.github.adetiamarhadi.thrift.MyService.Processor">
+        <constructor-arg ref="myServiceHandler" />
+    </bean>
+
+    <bean id="args" class="org.apache.thrift.server.TThreadPoolServer.Args">
+        <constructor-arg ref="tServerSocket" />
+    </bean>
+
+    <bean factory-bean="args" factory-method="processor">
+        <constructor-arg ref="myServiceProcessor" />
+    </bean>
+
+    <!-- Define TThreadPoolServer bean -->
+    <bean id="thriftServer" class="org.apache.thrift.server.TThreadPoolServer">
+        <constructor-arg ref="args">
+        </constructor-arg>
+    </bean>
+</beans>
